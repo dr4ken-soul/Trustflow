@@ -1,0 +1,8 @@
+node_modules/
+.env
+*.db
+trustflow.db
+trustflow.db-shm
+trustflow.db-wal
+uploads/
+logs/
