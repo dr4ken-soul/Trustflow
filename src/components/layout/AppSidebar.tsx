@@ -1,5 +1,5 @@
-import { Link, useLocation } from 'react-router-dom'
-import { LayoutDashboard, Upload, ClipboardCheck, Wallet } from 'lucide-react'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { LayoutDashboard, Upload, ClipboardCheck, Wallet, LogOut } from 'lucide-react'
 
 const NAV_ITEMS = [
   { to: '/dashboard', label: 'dashboard', icon: LayoutDashboard },
@@ -15,6 +15,7 @@ const NAV_ITEMS = [
  */
 export function AppSidebar() {
   const location = useLocation()
+  const navigate = useNavigate()
 
   return (
     <aside
@@ -67,6 +68,21 @@ export function AppSidebar() {
         </ul>
       </nav>
 
+      <div style={{ borderTop: '1px solid var(--border-subtle)' }}>
+        <button
+          id="sidebar-logout-btn"
+          onClick={() => navigate('/')}
+          className="w-full flex items-center gap-3 px-6 py-4 font-body text-sm transition-colors"
+          style={{ color: 'var(--text-secondary)' }}
+          onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--error)' }}
+          onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--text-secondary)' }}
+          aria-label="sign out"
+        >
+          <LogOut size={16} />
+          sign out
+        </button>
+      </div>
+
       <div
         className="px-6 py-4 font-mono text-xs"
         style={{ color: 'var(--text-muted)', borderTop: '1px solid var(--border-subtle)' }}
@@ -84,9 +100,10 @@ export function AppSidebar() {
  */
 export function MobileTabBar() {
   const location = useLocation()
+  const navigate = useNavigate()
   return (
     <nav
-      className="lg:hidden fixed bottom-0 inset-x-0 z-40 grid grid-cols-4 h-16"
+      className="lg:hidden fixed bottom-0 inset-x-0 z-40 grid grid-cols-5 h-16"
       style={{
         background: 'var(--bg-secondary)',
         borderTop: '1px solid var(--border-subtle)',
@@ -108,6 +125,16 @@ export function MobileTabBar() {
           </Link>
         )
       })}
+      <button
+        id="mobile-logout-btn"
+        onClick={() => navigate('/')}
+        className="flex flex-col items-center justify-center gap-1"
+        style={{ color: 'var(--text-secondary)' }}
+        aria-label="sign out"
+      >
+        <LogOut size={18} />
+        <span className="font-body text-[10px]">sign out</span>
+      </button>
     </nav>
   )
 }
