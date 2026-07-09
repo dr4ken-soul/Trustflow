@@ -1,9 +1,10 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { LayoutDashboard, Upload, ClipboardCheck, Wallet, LogOut } from 'lucide-react'
+import { LayoutDashboard, Upload, ClipboardCheck, Wallet, LogOut, Receipt } from 'lucide-react'
 
 const NAV_ITEMS = [
   { to: '/dashboard', label: 'dashboard', icon: LayoutDashboard },
   { to: '/onboarding', label: 'onboarding', icon: Upload },
+  { to: '/invoices', label: 'invoices', icon: Receipt },
   { to: '/review-queue', label: 'review queue', icon: ClipboardCheck },
   { to: '/payments', label: 'payments', icon: Wallet },
 ]
@@ -103,7 +104,7 @@ export function MobileTabBar() {
   const navigate = useNavigate()
   return (
     <nav
-      className="lg:hidden fixed bottom-0 inset-x-0 z-40 grid grid-cols-5 h-16"
+      className="lg:hidden fixed bottom-0 inset-x-0 z-40 grid grid-cols-6 h-16"
       style={{
         background: 'var(--bg-secondary)',
         borderTop: '1px solid var(--border-subtle)',

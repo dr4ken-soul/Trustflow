@@ -3,7 +3,7 @@ import multer from 'multer'
 import crypto from 'crypto'
 import db from './db.js'
 import { uploadFile, getSignedUrl } from './services/ossService.js'
-import { extractDocument, verifyExtractedData, reconcilePayment } from './services/qwenService.js'
+import { extractDocument, verifyExtractedData, reconcilePayment, extractInvoice } from './services/qwenService.js'
 
 const router = Router()
 const upload = multer({
@@ -255,6 +255,46 @@ router.post('/seed', (req, res) => {
       escalations: escalations.length
     }
   })
+})
+
+/**
+ * upload an invoice image, extract financial details with qwen vl max
+ * and create an invoice record using the extracted amount
+ */
+router.post('/invoices/upload', upload.single('file'), async (req, res) => {
+  const { client_id } = req.body
+
+  if (!client_id) return res.status(400).json({ error: 'client_id is required' })
+  if (!req.file) return res.status(400).json({ error: 'file is required' })
+
+  const client = db.prepare('select * from clients where id = ?').get(client_id)
+  if (!client) return res.status(404).json({ error: 'client not found' })
+
+  try {
+    const { key } = await uploadFile(req.file.buffer, req.file.originalname, req.file.mimetype)
+    const signedUrl = await getSignedUrl(key, 3600)
+
+    const extracted = await extractInvoice(signedUrl)
+
+    const invoiceId = genId('inv')
+    db.prepare(
+      'insert into invoices (id, client_id, amount, due_date, invoice_number, vendor_name, extracted_data) values (?, ?, ?, ?, ?, ?, ?)'
+    ).run(
+      invoiceId,
+      client_id,
+      extracted.amount_due,
+      extracted.due_date || null,
+      extracted.invoice_number || null,
+      extracted.vendor_name || null,
+      JSON.stringify(extracted)
+    )
+
+    const invoice = db.prepare('select * from invoices where id = ?').get(invoiceId)
+    res.json({ invoice, extracted })
+  } catch (err) {
+    console.error('invoice upload error', err.message)
+    res.status(500).json({ error: err.message })
+  }
 })
 
 /**

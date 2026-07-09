@@ -57,4 +57,21 @@ db.exec(`
   );
 `)
 
+/**
+ * safe migration: add new invoice columns if they do not already exist
+ * sqlite has no alter table add column if not exists so we check pragma first
+ */
+const invoicePragma = db.pragma('table_info(invoices)')
+const invoiceCols = new Set(invoicePragma.map(r => r.name))
+
+if (!invoiceCols.has('invoice_number')) {
+  db.exec('ALTER TABLE invoices ADD COLUMN invoice_number text')
+}
+if (!invoiceCols.has('vendor_name')) {
+  db.exec('ALTER TABLE invoices ADD COLUMN vendor_name text')
+}
+if (!invoiceCols.has('extracted_data')) {
+  db.exec('ALTER TABLE invoices ADD COLUMN extracted_data text')
+}
+
 export default db

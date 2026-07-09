@@ -43,6 +43,21 @@ export async function uploadDocument(
 }
 
 /**
+ * upload an invoice image for a client and trigger qwen vl extraction
+ * @param clientId
+ * @param file
+ */
+export async function uploadInvoice(clientId: string, file: File) {
+  const formData = new FormData()
+  formData.append('file', file)
+  formData.append('client_id', clientId)
+  const { data } = await api.post('/invoices/upload', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  })
+  return data
+}
+
+/**
  * submit a mock payment webhook
  * @param payload
  */

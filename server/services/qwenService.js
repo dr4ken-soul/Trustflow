@@ -65,6 +65,48 @@ export async function extractDocument(imageUrl, docType) {
 }
 
 /**
+ * extract invoice fields from an invoice image using qwen vl max
+ * takes a signed oss url and returns structured invoice json
+ * amount_due is extracted as a raw number from the document total
+ */
+export async function extractInvoice(imageUrl) {
+  const prompt = `extract the following fields from this invoice image and return as json only with no other text
+fields: invoice_number, vendor_name, client_name (the company or person being billed), amount_due as a plain number with no currency symbols (the final total due including tax), due_date as yyyy-mm-dd or empty string if not found, line_items as an array of objects
+return exactly this format
+{"invoice_number":"","vendor_name":"","client_name":"","amount_due":0,"due_date":"","line_items":[{"description":"","quantity":1,"unit_price":0,"amount":0}]}`
+
+  const response = await axios.post(
+    `${QWEN_ENDPOINT}/chat/completions`,
+    {
+      model: QWEN_VL_MODEL,
+      messages: [
+        {
+          role: 'user',
+          content: [
+            { type: 'text', text: prompt },
+            { type: 'image_url', image_url: { url: imageUrl } }
+          ]
+        }
+      ]
+    },
+    {
+      headers: {
+        'Authorization': `Bearer ${QWEN_API_KEY}`,
+        'Content-Type': 'application/json'
+      },
+      timeout: 60000
+    }
+  )
+
+  const content = response.data.choices[0].message.content
+  const jsonMatch = content.match(/\{[\s\S]*\}/)
+  if (!jsonMatch) {
+    throw new Error('qwen vl returned no parseable json for invoice: ' + content)
+  }
+  return JSON.parse(jsonMatch[0])
+}
+
+/**
  * verify extracted data using qwen max
  * takes extracted json and doc type, returns confidence score and decision
  */

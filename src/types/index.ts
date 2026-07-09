@@ -50,12 +50,31 @@ export interface Document {
 
 export type InvoiceStatus = 'outstanding' | 'settled'
 
+export interface ExtractedInvoice {
+  invoice_number?: string
+  vendor_name?: string
+  client_name?: string
+  amount_due: number
+  due_date?: string
+  line_items?: Array<{
+    description: string
+    quantity: number
+    unit_price: number
+    amount: number
+  }>
+}
+
 export interface Invoice {
   id: string
   client_id: string
+  client_name?: string
   amount: number
   status: InvoiceStatus
-  due_date: string
+  due_date?: string
+  invoice_number?: string
+  vendor_name?: string
+  extracted_data?: string
+  created_at: string
 }
 
 export type PaymentStatus = 'matched' | 'flagged'

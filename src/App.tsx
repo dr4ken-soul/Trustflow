@@ -3,6 +3,7 @@ import { AnimatePresence, motion, type Variants } from 'framer-motion'
 import { Landing } from './pages/Landing'
 import { Dashboard } from './pages/Dashboard'
 import { Onboarding } from './pages/Onboarding'
+import { Invoices } from './pages/Invoices'
 import { ReviewQueue } from './pages/ReviewQueue'
 import { Payments } from './pages/Payments'
 import { AppLayout } from './components/layout/AppLayout'
@@ -87,6 +88,16 @@ function AnimatedRoutes() {
             <AppLayout>
               <PageTransition>
                 <Onboarding />
+              </PageTransition>
+            </AppLayout>
+          }
+        />
+        <Route
+          path="/invoices"
+          element={
+            <AppLayout>
+              <PageTransition>
+                <Invoices />
               </PageTransition>
             </AppLayout>
           }
